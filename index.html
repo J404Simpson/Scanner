@@ -1,56 +1,26 @@
 <!DOCTYPE html>
-<html>
-  <body>
-    <video autoplay playsinline id="video" width="300"></video>
-    <script>
-      navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-        .then(stream => {
-          document.getElementById('video').srcObject = stream;
-        })
-        .catch(err => {
-          console.error("Camera error:", err);
-          alert("Camera error: " + err.message);
-        });
-    </script>
-  </body>
-</html>
-
-<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>Barcode Scanner</title>
+  <style>
+    video {
+      width: 100%;
+      max-width: 400px;
+      border: 2px solid #000;
+    }
+    #output {
+      margin-top: 20px;
+      font-size: 1.2em;
+    }
+  </style>
 </head>
 <body>
-  <h1>Scan a Barcode</h1>
-  <video id="video" width="300" height="200" autoplay muted playsinline></video>
-  <p><strong>Detected Barcode:</strong></p>
-  <pre id="result">Waiting...</pre>
+  <h1>Scan Barcode</h1>
+  <video id="video" autoplay muted></video>
+  <div id="output">Waiting for scan...</div>
 
-  <!-- ZXing library -->
-  <script src="https://unpkg.com/@zxing/browser@latest"></script>
+  <script src="https://unpkg.com/@zxing/library@0.18.6"></script>
   <script src="app.js"></script>
 </body>
-</html> -->
-
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Text Scanner</title>
-</head>
-<body>
-  <h1>Scan Text from Camera</h1>
-  <video id="video" autoplay playsinline width="300"></video>
-  <br />
-  <button id="capture">Capture</button>
-  <canvas id="canvas" width="300" height="200" style="display: none;"></canvas>
-  <p><strong>Extracted Text:</strong></p>
-  <pre id="output"></pre>
-
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.0.0/dist/tesseract.min.js"></script>
-  <script src="app.js"></script>
-</body>
-</html> -->
+</html>
