@@ -4,6 +4,7 @@ window.addEventListener('load', () => {
   const startBtn = document.getElementById('startBtn');
   const scanNextBtn = document.getElementById('scanNextBtn');
   const qrInput = document.getElementById('qrData');
+  const qrA = document.getElementById('test');
 
   const codeReader = new ZXing.BrowserMultiFormatReader();
 
@@ -38,6 +39,7 @@ window.addEventListener('load', () => {
   // Scan logic
   function startScan() {
     output.textContent = '📡 Scanning...';
+    qrA.value = qrInput;
     qrInput.value = '';
     scanNextBtn.disabled = true;
 
