@@ -47,11 +47,12 @@ window.addEventListener('load', () => {
     codeReader.decodeFromVideoDevice(currentDeviceId, videoElement, (result, err) => {
       if (result) {
         const text = result.getText();
+        const year = "20";
         console.log('✅ Scanned:', text);
         qrInput.value = text;
         lot.value = text.slice(35,45);
-        produced.value = text.slice(19,25);
-        expiry.value = text.slice(27,33);
+        produced.value = text.slice(27,33);
+        expiry.value = year.concat(text.slice(19,21), "-", text.slice(21,23), "-", text.slice(23,25));
         output.textContent = '✅ QR code scanned. Data added to form.';
         codeReader.reset(); // Stop scanning until re-enabled
         scanNextBtn.disabled = false;
