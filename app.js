@@ -49,9 +49,9 @@ window.addEventListener('load', () => {
         const text = result.getText();
         console.log('✅ Scanned:', text);
         qrInput.value = text;
-        lot.value = text.slice(1,44);
-        produced.value = text.slice(25,33);
-        expiry.value = text.slice(36,43);
+        lot.value = text.slice(35,45);
+        produced.value = text.slice(18,24);
+        expiry.value = text.slice(27,33);
         output.textContent = '✅ QR code scanned. Data added to form.';
         codeReader.reset(); // Stop scanning until re-enabled
         scanNextBtn.disabled = false;
