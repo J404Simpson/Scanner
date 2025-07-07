@@ -4,8 +4,8 @@ window.addEventListener('load', () => {
   const startBtn = document.getElementById('startBtn');
   const scanNextBtn = document.getElementById('scanNextBtn');
   const qrInput = document.getElementById('qrData');
-  const lot = document.getElementById('expiryDate');
-  const produced = document.getElementById('expiryDate');
+  const lot = document.getElementById('lotNumber');
+  const produced = document.getElementById('productionDate');
   const expiry = document.getElementById('expiryDate');
 
   const codeReader = new ZXing.BrowserMultiFormatReader();
@@ -50,8 +50,8 @@ window.addEventListener('load', () => {
         console.log('✅ Scanned:', text);
         qrInput.value = text;
         lot.value = text.slice(35,44);
-        produced.value = text.slice(19,24);
-        expiry.value = text.slice(27,32);
+        produced.value = text.slice(25,33);
+        expiry.value = text.slice(36,43);
         output.textContent = '✅ QR code scanned. Data added to form.';
         codeReader.reset(); // Stop scanning until re-enabled
         scanNextBtn.disabled = false;
