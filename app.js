@@ -30,5 +30,3 @@ window.addEventListener('load', () => {
       output.textContent = `❌ Camera access error: ${err}`;
     });
 });
-
-console.log(videoInputDevices);
