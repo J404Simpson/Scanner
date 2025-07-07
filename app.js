@@ -39,7 +39,6 @@ window.addEventListener('load', () => {
   // Scan logic
   function startScan() {
     output.textContent = '📡 Scanning...';
-    qrA.value = qrInput;
     qrInput.value = '';
     scanNextBtn.disabled = true;
 
@@ -60,6 +59,7 @@ window.addEventListener('load', () => {
 
   // Handle "Scan Next" click
   scanNextBtn.addEventListener('click', () => {
+    qrA.value = qrInput;
     startScan();
   });
 });
