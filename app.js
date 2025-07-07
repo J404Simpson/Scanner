@@ -47,6 +47,7 @@ window.addEventListener('load', () => {
         const text = result.getText();
         console.log('✅ Scanned:', text);
         qrInput.value = text;
+        qrA.value = text;
         output.textContent = '✅ QR code scanned. Data added to form.';
         codeReader.reset(); // Stop scanning until re-enabled
         scanNextBtn.disabled = false;
@@ -59,7 +60,6 @@ window.addEventListener('load', () => {
 
   // Handle "Scan Next" click
   scanNextBtn.addEventListener('click', () => {
-    qrA.value = qrInput;
     startScan();
   });
 });
