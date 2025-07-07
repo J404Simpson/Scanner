@@ -49,7 +49,7 @@ window.addEventListener('load', () => {
         const text = result.getText();
         console.log('✅ Scanned:', text);
         qrInput.value = text;
-        lot.value = text.slice(35,44);
+        lot.value = text.slice(1,44);
         produced.value = text.slice(25,33);
         expiry.value = text.slice(36,43);
         output.textContent = '✅ QR code scanned. Data added to form.';
