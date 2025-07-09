@@ -34,6 +34,10 @@ document.addEventListener('DOMContentLoaded', () => {
     output.textContent = '📡 Scanning...';
     scanNextBtn.disabled = true;
 
+    if (startBtn.style.display === "block") {
+      startBtn.style.display === "none";
+    }
+
     codeReader.decodeFromVideoDevice(currentDeviceId, videoElement, (result, err) => {
       if (result) {
         const code = result.getText();
