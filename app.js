@@ -61,6 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
           return;
         }
 
+        // Checks if QR code already exists in table
         const existing = scannedCodes.find(entry => entry.code === code);
         if (existing) {
           existing.count++;
