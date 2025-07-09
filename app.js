@@ -38,6 +38,7 @@ window.addEventListener('load', () => {
   });
 
   function startScan() {
+    codeReader.reset(); // 🚨 Reset before starting a new scan
     output.textContent = '📡 Scanning...';
     scanNextBtn.disabled = true;
 
@@ -46,10 +47,9 @@ window.addEventListener('load', () => {
         const scanned = result.getText();
         console.log('✅ Scanned:', scanned);
 
-        lastScannedCode = scanned; // track last scanned
+        lastScannedCode = scanned;
         removeLastBtn.disabled = false;
 
-        // ✅ Check that the scanned code is exactly 45 characters
         if (scanned.length !== 45) {
           output.textContent = `❌ Invalid QR code. Length is ${scanned.length}, expected 45.`;
           codeReader.reset();
@@ -72,9 +72,13 @@ window.addEventListener('load', () => {
         codeReader.reset();
         scanNextBtn.disabled = false;
         submitBtn.disabled = scannedCodes.length === 0;
+        removeLastBtn.disabled = scannedCodes.length === 0;
+
       } else if (err && !(err instanceof ZXing.NotFoundException)) {
         console.error('Scan error:', err);
-        output.textContent = '⚠️ Scan error.';
+        output.textContent = `⚠️ Scan error: ${err.message || err}`;
+        codeReader.reset();
+        scanNextBtn.disabled = false;
       }
     });
   }
