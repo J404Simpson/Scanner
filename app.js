@@ -46,12 +46,12 @@ window.addEventListener('load', () => {
         console.log('✅ Scanned:', scanned);
 
         // Prevent duplicates
-        if (!scannedCodes.includes(scanned)) {
+        // if (!scannedCodes.includes(scanned)) {
           scannedCodes.push(scanned);
           addToTable(scannedCodes.length, scanned);
-        } else {
-          output.textContent = '⚠️ Duplicate QR code ignored.';
-        }
+        // } else {
+          // output.textContent = '⚠️ Duplicate QR code ignored.';
+        // }
 
         output.textContent = '✅ Scan complete. Click "Scan Next" to continue.';
         codeReader.reset();
