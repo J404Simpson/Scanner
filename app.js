@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
     codeReader.reset();
     output.textContent = '📡 Scanning...';
     scanNextBtn.disabled = true;
+    removeLastBtn.style.visibility = "hidden";
 
     codeReader.decodeFromVideoDevice(currentDeviceId, videoElement, (result, err) => {
       if (result) {
