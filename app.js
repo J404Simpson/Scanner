@@ -5,10 +5,13 @@ window.addEventListener('load', () => {
   const scanNextBtn = document.getElementById('scanNextBtn');
   const submitBtn = document.getElementById('submitBtn');
   const scanTableBody = document.querySelector('#scanTable tbody');
+  const removeLastBtn = document.getElementById('removeLastBtn');
 
   const codeReader = new ZXing.BrowserMultiFormatReader();
-  let currentDeviceId = null;
   const scannedCodes = []; // array of { code: string, count: number }
+
+  let currentDeviceId = null;
+  let lastScannedCode = null;
 
   startBtn.addEventListener('click', () => {
     output.textContent = '📷 Initializing camera...';
@@ -42,6 +45,9 @@ window.addEventListener('load', () => {
       if (result) {
         const scanned = result.getText();
         console.log('✅ Scanned:', scanned);
+
+        lastScannedCode = scanned; // track last scanned
+        removeLastBtn.disabled = false;
 
         // ✅ Check that the scanned code is exactly 45 characters
         if (scanned.length !== 45) {
@@ -94,6 +100,13 @@ window.addEventListener('load', () => {
     }
   }
 
+  function removeTableRow(code) {
+    const row = scanTableBody.querySelector(`tr[data-code="${code}"]`);
+    if (row) {
+      scanTableBody.removeChild(row);
+    }
+  }
+
   // Submit scanned data
   submitBtn.addEventListener('click', () => {
     if (scannedCodes.length === 0) return;
@@ -117,6 +130,34 @@ window.addEventListener('load', () => {
       console.error(err);
       output.textContent = '❌ Failed to submit. See console.';
     });
+  });
+
+  // Remove last added
+  removeLastBtn.addEventListener('click', () => {
+    if (!lastScannedCode) return;
+
+    const index = scannedCodes.findIndex(entry => entry.code === lastScannedCode);
+    if (index === -1) return;
+
+    const entry = scannedCodes[index];
+
+    if (entry.count > 1) {
+      entry.count -= 1;
+      updateTableCount(entry.code, entry.count);
+      output.textContent = `↩️ Removed 1 from count (${entry.count} remaining)`;
+    } else {
+      scannedCodes.splice(index, 1);
+      removeTableRow(entry.code);
+      output.textContent = `🗑️ Removed last scanned code`;
+    }
+
+    // Update states
+    if (scannedCodes.length === 0) {
+      submitBtn.disabled = true;
+      removeLastBtn.disabled = true;
+    }
+
+    lastScannedCode = null;
   });
 });
 
