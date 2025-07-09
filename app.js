@@ -43,6 +43,14 @@ window.addEventListener('load', () => {
         const scanned = result.getText();
         console.log('✅ Scanned:', scanned);
 
+        // ✅ Check that the scanned code is exactly 45 characters
+        if (scanned.length !== 45) {
+          output.textContent = `❌ Invalid QR code. Length is ${scanned.length}, expected 45.`;
+          codeReader.reset();
+          scanNextBtn.disabled = false;
+          return;
+        }
+
         const existing = scannedCodes.find(entry => entry.code === scanned);
         if (existing) {
           existing.count += 1;
