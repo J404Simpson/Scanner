@@ -42,6 +42,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (result) {
         const code = result.getText();
         lastScannedCode = code;
+        if (removeLastBtn.style.visibility === "hidden") {
+          removeLastBtn.style.visibility = "visible";
+        };
         if (removeLastBtn) removeLastBtn.disabled = false;
 
         // Checks QR code is correct length
