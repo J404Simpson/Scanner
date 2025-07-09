@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const startBtn = document.getElementById('startBtn');
   const scanNextBtn = document.getElementById('scanNextBtn');
   const removeLastBtn = document.getElementById('removeLastBtn');
+  const submitBtn = document.getElementById('submitBtn');
   const scanTableBody = document.querySelector('#scanTable tbody');
 
   const codeReader = new ZXing.BrowserMultiFormatReader();
@@ -38,6 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
     output.textContent = '📡 Scanning...';
     scanNextBtn.disabled = true;
     removeLastBtn.style.visibility = "hidden";
+    submitBtn.disabled = false;
 
     codeReader.decodeFromVideoDevice(currentDeviceId, videoElement, (result, err) => {
       if (result) {
@@ -130,8 +132,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (scannedCodes.length === 0) {
         if (removeLastBtn) removeLastBtn.disabled = true;
+        if (submitBtn) submitBtn.disabled = true;
       }
       lastScannedCode = null;
     }
+  });
+
+  submitBtn.addEventListener('click', () => {
+    if (scannedCodes.length === 0) {
+      output.textContent = '⚠️ No codes to submit.';
+      return;
+    }
+
+    output.textContent = '🚀 Submitting scanned codes...';
+
+    console.log({ codes: scannedCodes })
+
+    // 🔁 Replace this with your real API URL
+    // fetch('https://your-api.com/submit', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify({ codes: scannedCodes })
+    // })
+    // .then(res => {
+    //   if (!res.ok) throw new Error('Server returned an error');
+    //   return res.json();
+    // })
+    // .then(data => {
+    //   output.textContent = '✅ Data submitted successfully!';
+    //   console.log('Server response:', data);
+    // })
+    // .catch(err => {
+    //   output.textContent = '❌ Submission failed. Check console.';
+    //   console.error('Submission error:', err);
+    // });
   });
 });
