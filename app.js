@@ -35,16 +35,13 @@ document.addEventListener('DOMContentLoaded', () => {
     output.textContent = '📡 Scanning...';
     scanNextBtn.disabled = true;
 
-    // if (startBtn.style.display === "block") {
-    //   startBtn.style.display = "none";
-    // }
-
     codeReader.decodeFromVideoDevice(currentDeviceId, videoElement, (result, err) => {
       if (result) {
         const code = result.getText();
         lastScannedCode = code;
         if (removeLastBtn) removeLastBtn.disabled = false;
 
+        // Checks QR code is correct length
         if (code.length !== 45) {
           output.textContent = `❌ Invalid code (length ${code.length}, expected 45)`;
           codeReader.reset();
@@ -76,9 +73,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function addToTable(index, entry) {
+    const year = "20"
     const row = document.createElement('tr');
+    const device = entry.code.slice(1,17);
+    const lot = entry.code.slice(35,45);
+    const produced = year.concat(entry.code.slice(27,29), "-", entry.code.slice(29,31), "-", entry.code.slice(31,33));
+    const expiry = year.concat(entry.code.slice(19,21), "-", entry.code.slice(21,23), "-", entry.code.slice(23,25));
     row.dataset.code = entry.code;
-    row.innerHTML = `<td>${index}</td><td>${entry.code}</td><td class="count">${entry.count}</td>`;
+    row.innerHTML = `<td>${index}</td><td>${device}</td><td>${produced}</td><td>${expiry}</td><td>${lot}</td><td class="count">${entry.count}</td>`;
     scanTableBody.appendChild(row);
   }
 
