@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Checks QR code is correct length
         if (code.length !== 45) {
-          output.textContent = `❌ Invalid code (length ${code.length}, expected 45)`;
+          output.textContent = `❌ Invalid code (length ${code.length}, expected 45). ${code}`;
           codeReader.reset();
           if (scanNextBtn.style.visibility === "hidden") {
             scanNextBtn.style.visibility = "visible";
@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
   removeLastBtn.addEventListener('click', () => {
 
     removeLastBtn.style.visibility = "hidden";
-    
+
     if (!lastScannedCode) return;
 
     const index = scannedCodes.findIndex(entry => entry.code === lastScannedCode);
