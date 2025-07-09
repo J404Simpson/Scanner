@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (result) {
         const code = result.getText();
         lastScannedCode = code;
-        removeLastBtn.disabled = false;
+        if (removeLastBtn) removeLastBtn.disabled = false;
 
         if (code.length !== 45) {
           output.textContent = `❌ Invalid code (length ${code.length}, expected 45)`;
@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       if (scannedCodes.length === 0) {
-        removeLastBtn.disabled = true;
+        if (removeLastBtn) removeLastBtn.disabled = true;
       }
       lastScannedCode = null;
     }
