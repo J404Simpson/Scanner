@@ -1,10 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
+
+  console.log('Page ready, finding button...');
+  const removeLastBtn = document.getElementById('removeLastBtn');
+  console.log('Found button:', removeLastBtn);
+
   const videoElement = document.getElementById('video');
   const output = document.getElementById('output');
   const startBtn = document.getElementById('startBtn');
   const scanNextBtn = document.getElementById('scanNextBtn');
   const submitBtn = document.getElementById('submitBtn');
-  const removeLastBtn = document.getElementById('removeLastBtn');
+  // const removeLastBtn = document.getElementById('removeLastBtn');
   const scanTableBody = document.querySelector('#scanTable tbody');
 
   const codeReader = new ZXing.BrowserMultiFormatReader();
