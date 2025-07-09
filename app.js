@@ -3,13 +3,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const output = document.getElementById('output');
   const startBtn = document.getElementById('startBtn');
   const scanNextBtn = document.getElementById('scanNextBtn');
-  const submitBtn = document.getElementById('submitBtn');
   const scanTableBody = document.querySelector('#scanTable tbody');
   const removeLastBtn = document.getElementById('removeLastBtn');
 
   const codeReader = new ZXing.BrowserMultiFormatReader();
-  const scannedCodes = []; // { code: string, count: number }
-
+  const scannedCodes = [];
   let currentDeviceId = null;
   let lastScannedCode = null;
 
@@ -17,52 +15,45 @@ document.addEventListener('DOMContentLoaded', () => {
     output.textContent = '📷 Initializing camera...';
     videoElement.style.display = 'block';
 
-    codeReader.listVideoInputDevices()
-      .then(videoInputDevices => {
-        if (videoInputDevices.length === 0) {
-          output.textContent = '❌ No camera devices found.';
-          return;
-        }
+    codeReader.listVideoInputDevices().then(devices => {
+      if (devices.length === 0) {
+        output.textContent = '❌ No camera found.';
+        return;
+      }
 
-        const rearCamera = videoInputDevices.find(device =>
-          device.label.toLowerCase().includes('back')
-        ) || videoInputDevices[0];
-
-        currentDeviceId = rearCamera.deviceId;
-        startScan();
-      })
-      .catch(err => {
-        console.error('Camera access error:', err);
-        output.textContent = `❌ Camera access error: ${err.message || err}`;
-      });
+      currentDeviceId = devices[0].deviceId;
+      startScan();
+    }).catch(err => {
+      output.textContent = `❌ Camera error: ${err.message || err}`;
+      console.error(err);
+    });
   });
 
   function startScan() {
-    codeReader.reset(); // always reset before scanning
+    codeReader.reset();
     output.textContent = '📡 Scanning...';
     scanNextBtn.disabled = true;
 
     codeReader.decodeFromVideoDevice(currentDeviceId, videoElement, (result, err) => {
       if (result) {
-        const scanned = result.getText();
-        console.log('✅ Scanned:', scanned);
+        const code = result.getText();
+        lastScannedCode = code;
+        removeLastBtn.disabled = false;
 
-        lastScannedCode = scanned;
-
-        if (scanned.length !== 45) {
-          output.textContent = `❌ Invalid QR code. Length is ${scanned.length}, expected 45.`;
+        if (code.length !== 45) {
+          output.textContent = `❌ Invalid code (length ${code.length}, expected 45)`;
           codeReader.reset();
           scanNextBtn.disabled = false;
           return;
         }
 
-        const existing = scannedCodes.find(entry => entry.code === scanned);
+        const existing = scannedCodes.find(entry => entry.code === code);
         if (existing) {
-          existing.count += 1;
-          updateTableCount(existing.code, existing.count);
+          existing.count++;
+          updateCount(code, existing.count);
           output.textContent = '➕ Duplicate found. Count incremented.';
         } else {
-          const entry = { code: scanned, count: 1 };
+          const entry = { code, count: 1 };
           scannedCodes.push(entry);
           addToTable(scannedCodes.length, entry);
           output.textContent = '✅ New QR code added.';
@@ -70,94 +61,52 @@ document.addEventListener('DOMContentLoaded', () => {
 
         codeReader.reset();
         scanNextBtn.disabled = false;
-        submitBtn.disabled = false;
-        removeLastBtn.disabled = false;
-
       } else if (err && !(err instanceof ZXing.NotFoundException)) {
+        output.textContent = '⚠️ Scan error.';
         console.error('Scan error:', err);
-        output.textContent = `⚠️ Scan error: ${err.message || err}`;
         codeReader.reset();
         scanNextBtn.disabled = false;
       }
     });
   }
 
-  scanNextBtn.addEventListener('click', () => {
-    startScan();
-  });
-
   function addToTable(index, entry) {
     const row = document.createElement('tr');
-    row.setAttribute('data-code', entry.code);
-    row.innerHTML = `<td>${index}</td><td>${entry.code}</td><td class="count-cell">1</td>`;
+    row.dataset.code = entry.code;
+    row.innerHTML = `<td>${index}</td><td>${entry.code}</td><td class="count">${entry.count}</td>`;
     scanTableBody.appendChild(row);
   }
 
-  function updateTableCount(code, newCount) {
+  function updateCount(code, count) {
     const row = scanTableBody.querySelector(`tr[data-code="${code}"]`);
     if (row) {
-      const countCell = row.querySelector('.count-cell');
-      if (countCell) {
-        countCell.textContent = newCount;
-      }
+      row.querySelector('.count').textContent = count;
     }
   }
 
-  function removeTableRow(code) {
-    const row = scanTableBody.querySelector(`tr[data-code="${code}"]`);
-    if (row) {
-      scanTableBody.removeChild(row);
-    }
-  }
-
-  submitBtn.addEventListener('click', () => {
-    if (scannedCodes.length === 0) return;
-
-    output.textContent = '🚀 Submitting scanned codes...';
-
-    fetch('https://your-api.com/submit', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ codes: scannedCodes })
-    })
-      .then(res => {
-        if (!res.ok) throw new Error('Submission failed');
-        return res.json();
-      })
-      .then(data => {
-        output.textContent = '✅ Data submitted successfully!';
-        console.log(data);
-      })
-      .catch(err => {
-        console.error(err);
-        output.textContent = '❌ Failed to submit. See console.';
-      });
-  });
+  scanNextBtn.addEventListener('click', () => startScan());
 
   removeLastBtn.addEventListener('click', () => {
     if (!lastScannedCode) return;
 
     const index = scannedCodes.findIndex(entry => entry.code === lastScannedCode);
-    if (index === -1) return;
+    if (index !== -1) {
+      const entry = scannedCodes[index];
+      if (entry.count > 1) {
+        entry.count--;
+        updateCount(entry.code, entry.count);
+        output.textContent = `↩️ Decremented count (${entry.count} left)`;
+      } else {
+        scannedCodes.splice(index, 1);
+        scanTableBody.querySelector(`tr[data-code="${entry.code}"]`).remove();
+        output.textContent = '🗑️ Removed last scanned code';
+      }
 
-    const entry = scannedCodes[index];
-
-    if (entry.count > 1) {
-      entry.count -= 1;
-      updateTableCount(entry.code, entry.count);
-      output.textContent = `↩️ Removed 1 from count (${entry.count} remaining)`;
-    } else {
-      scannedCodes.splice(index, 1);
-      removeTableRow(entry.code);
-      output.textContent = `🗑️ Removed last scanned code`;
+      if (scannedCodes.length === 0) {
+        removeLastBtn.disabled = true;
+      }
+      lastScannedCode = null;
     }
-
-    if (scannedCodes.length === 0) {
-      submitBtn.disabled = true;
-      removeLastBtn.disabled = true;
-    }
-
-    lastScannedCode = null;
   });
 });
 
