@@ -1,4 +1,4 @@
-window.addEventListener('load', () => {
+document.addEventListener('DOMContentLoaded', () => {
   const videoElement = document.getElementById('video');
   const output = document.getElementById('output');
   const startBtn = document.getElementById('startBtn');
