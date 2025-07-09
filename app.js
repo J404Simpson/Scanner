@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let lastScannedCode = null;
 
   startBtn.addEventListener('click', () => {
+    startBtn.style.display = "none";
     output.textContent = '📷 Initializing camera...';
     videoElement.style.display = 'block';
 
@@ -34,9 +35,9 @@ document.addEventListener('DOMContentLoaded', () => {
     output.textContent = '📡 Scanning...';
     scanNextBtn.disabled = true;
 
-    if (startBtn.style.display === "block") {
-      startBtn.style.display === "none";
-    }
+    // if (startBtn.style.display === "block") {
+    //   startBtn.style.display = "none";
+    // }
 
     codeReader.decodeFromVideoDevice(currentDeviceId, videoElement, (result, err) => {
       if (result) {
