@@ -4,8 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const startBtn = document.getElementById('startBtn');
   const scanNextBtn = document.getElementById('scanNextBtn');
   const submitBtn = document.getElementById('submitBtn');
-  const scanTableBody = document.querySelector('#scanTable tbody');
   const removeLastBtn = document.getElementById('removeLastBtn');
+  const scanTableBody = document.querySelector('#scanTable tbody');
 
   const codeReader = new ZXing.BrowserMultiFormatReader();
   const scannedCodes = []; // array of { code: string, count: number }
