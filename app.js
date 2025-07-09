@@ -1,19 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
-
-  console.log('Page ready, finding button...');
-  const removeLastBtn = document.getElementById('removeLastBtn');
-  console.log('Found button:', removeLastBtn);
-
   const videoElement = document.getElementById('video');
   const output = document.getElementById('output');
   const startBtn = document.getElementById('startBtn');
   const scanNextBtn = document.getElementById('scanNextBtn');
   const submitBtn = document.getElementById('submitBtn');
-  // const removeLastBtn = document.getElementById('removeLastBtn');
   const scanTableBody = document.querySelector('#scanTable tbody');
+  const removeLastBtn = document.getElementById('removeLastBtn');
 
   const codeReader = new ZXing.BrowserMultiFormatReader();
-  const scannedCodes = []; // array of { code: string, count: number }
+  const scannedCodes = []; // { code: string, count: number }
 
   let currentDeviceId = null;
   let lastScannedCode = null;
@@ -38,12 +33,12 @@ document.addEventListener('DOMContentLoaded', () => {
       })
       .catch(err => {
         console.error('Camera access error:', err);
-        output.textContent = `❌ Camera access error: ${err}`;
+        output.textContent = `❌ Camera access error: ${err.message || err}`;
       });
   });
 
   function startScan() {
-    codeReader.reset(); // 🚨 Reset before starting a new scan
+    codeReader.reset(); // always reset before scanning
     output.textContent = '📡 Scanning...';
     scanNextBtn.disabled = true;
 
@@ -53,7 +48,6 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('✅ Scanned:', scanned);
 
         lastScannedCode = scanned;
-        removeLastBtn.disabled = false;
 
         if (scanned.length !== 45) {
           output.textContent = `❌ Invalid QR code. Length is ${scanned.length}, expected 45.`;
@@ -76,8 +70,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         codeReader.reset();
         scanNextBtn.disabled = false;
-        submitBtn.disabled = scannedCodes.length === 0;
-        removeLastBtn.disabled = scannedCodes.length === 0;
+        submitBtn.disabled = false;
+        removeLastBtn.disabled = false;
 
       } else if (err && !(err instanceof ZXing.NotFoundException)) {
         console.error('Scan error:', err);
@@ -94,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function addToTable(index, entry) {
     const row = document.createElement('tr');
-    row.setAttribute('data-code', entry.code); // used to update count later
+    row.setAttribute('data-code', entry.code);
     row.innerHTML = `<td>${index}</td><td>${entry.code}</td><td class="count-cell">1</td>`;
     scanTableBody.appendChild(row);
   }
@@ -116,7 +110,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Submit scanned data
   submitBtn.addEventListener('click', () => {
     if (scannedCodes.length === 0) return;
 
@@ -127,21 +120,20 @@ document.addEventListener('DOMContentLoaded', () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ codes: scannedCodes })
     })
-    .then(res => {
-      if (!res.ok) throw new Error('Submission failed');
-      return res.json();
-    })
-    .then(data => {
-      output.textContent = '✅ Data submitted successfully!';
-      console.log(data);
-    })
-    .catch(err => {
-      console.error(err);
-      output.textContent = '❌ Failed to submit. See console.';
-    });
+      .then(res => {
+        if (!res.ok) throw new Error('Submission failed');
+        return res.json();
+      })
+      .then(data => {
+        output.textContent = '✅ Data submitted successfully!';
+        console.log(data);
+      })
+      .catch(err => {
+        console.error(err);
+        output.textContent = '❌ Failed to submit. See console.';
+      });
   });
 
-  // Remove last added
   removeLastBtn.addEventListener('click', () => {
     if (!lastScannedCode) return;
 
@@ -160,7 +152,6 @@ document.addEventListener('DOMContentLoaded', () => {
       output.textContent = `🗑️ Removed last scanned code`;
     }
 
-    // Update states
     if (scannedCodes.length === 0) {
       submitBtn.disabled = true;
       removeLastBtn.disabled = true;
