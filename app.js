@@ -110,6 +110,9 @@ document.addEventListener('DOMContentLoaded', () => {
   scanNextBtn.addEventListener('click', () => startScan());
 
   removeLastBtn.addEventListener('click', () => {
+
+    removeLastBtn.style.visibility = "hidden";
+    
     if (!lastScannedCode) return;
 
     const index = scannedCodes.findIndex(entry => entry.code === lastScannedCode);
