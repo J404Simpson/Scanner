@@ -7,7 +7,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const submitBtn = document.getElementById('submitBtn');
   const scanTableBody = document.querySelector('#scanTable tbody');
 
-  const codeReader = new ZXing.BrowserMultiFormatReader();
+  const hints = new Map();
+  const formats = [
+    ZXing.BarcodeFormat.DATA_MATRIX,
+    ZXing.BarcodeFormat.EAN_13,
+    ZXing.BarcodeFormat.EAN_8,
+    ZXing.BarcodeFormat.UPC_A,
+    ZXing.BarcodeFormat.UPC_E
+  ];
+
+  hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, formats);
+
+  const codeReader = new ZXing.BrowserMultiFormatReader(hints);
+
   const scannedCodes = [];
   let currentDeviceId = null;
   let lastScannedCode = null;
