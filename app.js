@@ -104,6 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function addToTable(index, entry) {
     const year = "20"
     const row = document.createElement('tr');
+    const code = entry.code 
     const device = entry.code.slice(1,17);
     const lot = entry.code.slice(35,45);
     const produced = year.concat(entry.code.slice(27,29), "-", entry.code.slice(29,31), "-", entry.code.slice(31,33));
