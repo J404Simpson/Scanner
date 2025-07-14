@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // If the format is DATA_MATRIX (5)
     else if (format === ZXing.BarcodeFormat.DATA_MATRIX) {
       // Strip control character at beginning if present
-      if (code = code.charCodeAt(0) < 32) {
+      if (code.charCodeAt(0) < 32) {
         code = code.slice(1);
       }
 
