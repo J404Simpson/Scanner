@@ -52,8 +52,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     codeReader.decodeFromVideoDevice(currentDeviceId, videoElement, (result, err) => {
       if (result) {
-        const code = result.getText().slice(1);
         const format = result.getBarcodeFormat();
+        const code = result.getText().slice(1);
         lastScannedCode = code;
         if (removeLastBtn.style.visibility === "hidden") {
           removeLastBtn.style.visibility = "visible";
@@ -61,15 +61,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (removeLastBtn) removeLastBtn.disabled = false;
 
         // Checks QR code is correct length
-        if (code.length < 44 || code.length > 45) {
-          output.textContent = `❌ Invalid code (length ${code.length}, expected 45). ${code}`;
-          codeReader.reset();
-          if (scanNextBtn.style.visibility === "hidden") {
-            scanNextBtn.style.visibility = "visible";
-          };
-          scanNextBtn.disabled = false;
-          return;
-        }
+        // if (code.length < 43 || code.length > 44) {
+        //   output.textContent = `❌ Invalid code (length ${code.length}, expected 45). ${code}`;
+        //   codeReader.reset();
+        //   if (scanNextBtn.style.visibility === "hidden") {
+        //     scanNextBtn.style.visibility = "visible";
+        //   };
+        //   scanNextBtn.disabled = false;
+        //   return;
+        // }
 
         // Checks if QR code already exists in table
         const existing = scannedCodes.find(entry => entry.code === code);
@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
           updateCount(code, existing.count);
           output.textContent = '➕ Duplicate found. Count incremented.';
         } else {
-          const entry = { code, count: 1 };
+          const entry = { code, format, count: 1 };
           scannedCodes.push(entry);
           addToTable(scannedCodes.length, entry);
           output.textContent = '✅ New QR code added.';
@@ -104,13 +104,14 @@ document.addEventListener('DOMContentLoaded', () => {
   function addToTable(index, entry) {
     const year = "20"
     const row = document.createElement('tr');
-    const code = entry.code 
+    const code = entry.code;
+    const format = entry.format;
     const device = entry.code.slice(0,16);
     const lot = entry.code.slice(34,44);
     const produced = year.concat(entry.code.slice(26,28), "-", entry.code.slice(28,30), "-", entry.code.slice(30,32));
     const expiry = year.concat(entry.code.slice(18,20), "-", entry.code.slice(20,22), "-", entry.code.slice(22,24));
     row.dataset.code = entry.code;
-    row.innerHTML = `<td>${index}</td><td>${code}</td><td>${device}</td><td>${produced}</td><td>${expiry}</td><td>${lot}</td><td class="count">${entry.count}</td>`;
+    row.innerHTML = `<td>${index}</td><td>${format}</td><td>${code}</td><td>${device}</td><td>${produced}</td><td>${expiry}</td><td>${lot}</td><td class="count">${entry.count}</td>`;
     scanTableBody.appendChild(row);
   }
 
@@ -178,5 +179,6 @@ document.addEventListener('DOMContentLoaded', () => {
     //   output.textContent = '❌ Submission failed. Check console.';
     //   console.error('Submission error:', err);
     // });
+
   });
 });
