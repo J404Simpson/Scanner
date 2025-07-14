@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const produced = year.concat(entry.code.slice(27,29), "-", entry.code.slice(29,31), "-", entry.code.slice(31,33));
     const expiry = year.concat(entry.code.slice(19,21), "-", entry.code.slice(21,23), "-", entry.code.slice(23,25));
     row.dataset.code = entry.code;
-    row.innerHTML = `<td>${index}</td><td>${device}</td><td>${produced}</td><td>${expiry}</td><td>${lot}</td><td class="count">${entry.count}</td>`;
+    row.innerHTML = `<td>${index}</td><td>${code}</td><td>${device}</td><td>${produced}</td><td>${expiry}</td><td>${lot}</td><td class="count">${entry.count}</td>`;
     scanTableBody.appendChild(row);
   }
 
