@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const hints = new Map();
   const formats = [
     ZXing.BarcodeFormat.CODE_128,
-    ZXing.BarcodeFormat.RSS_EXPANDED
+    ZXing.BarcodeFormat.DATA_MATRIX
   ];
 
   hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, formats);
