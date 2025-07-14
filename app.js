@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     codeReader.decodeFromVideoDevice(currentDeviceId, videoElement, (result, err) => {
       if (result) {
-        const code = result.getText();
+        const code = result.getText().slice(1);
         const format = result.getBarcodeFormat();
         lastScannedCode = code;
         if (removeLastBtn.style.visibility === "hidden") {
@@ -107,8 +107,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const code = entry.code 
     const device = entry.code.slice(1,17);
     const lot = entry.code.slice(35,45);
-    const produced = year.concat(entry.code.slice(27,29), "-", entry.code.slice(29,31), "-", entry.code.slice(31,33));
-    const expiry = year.concat(entry.code.slice(19,21), "-", entry.code.slice(21,23), "-", entry.code.slice(23,25));
+    const produced = year.concat(entry.code.slice(26,28), "-", entry.code.slice(28,30), "-", entry.code.slice(30,32));
+    const expiry = year.concat(entry.code.slice(18,20), "-", entry.code.slice(20,22), "-", entry.code.slice(22,24));
     row.dataset.code = entry.code;
     row.innerHTML = `<td>${index}</td><td>${code}</td><td>${device}</td><td>${produced}</td><td>${expiry}</td><td>${lot}</td><td class="count">${entry.count}</td>`;
     scanTableBody.appendChild(row);
