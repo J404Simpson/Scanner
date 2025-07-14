@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const hints = new Map();
   const formats = [
-    ZXing.BarcodeFormat.DATA_MATRIX,
+    ZXing.BarcodeFormat.CODE_128,
     ZXing.BarcodeFormat.RSS_EXPANDED
   ];
 
