@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const result = {};
 
     // If the format is CODE_128 (4)
-    if (format === 4) {
+    if (format === ZXing.BarcodeFormat.CODE_128) {
       const aiRegex = /\((\d{2})\)([^\(]+)/g;
       let match;
       while ((match = aiRegex.exec(code)) !== null) {
@@ -147,17 +147,21 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // Else: assume it's a 45-character flat string from Data Matrix
-    else if (format === 5) {
-      const code = entry.code.slice(1);
+    // If the format is DATA_MATRIX (5)
+    else if (format === ZXing.BarcodeFormat.DATA_MATRIX) {
+      // Strip control character at beginning if present
+      if (code = code.charCodeAt(0) < 32) {
+        code = code.slice(1);
+      }
+
       result.device = code.slice(0, 16);
       result.expiry = `20${code.slice(18, 20)}-${code.slice(20, 22)}-${code.slice(22, 24)}`;
       result.produced = `20${code.slice(26, 28)}-${code.slice(28, 30)}-${code.slice(30, 32)}`;
       result.lot = code.slice(34, 44);
     }
 
-  return result;
-}
+    return result;
+  }
 
 
   function updateCount(code, count) {
