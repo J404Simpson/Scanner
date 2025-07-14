@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (removeLastBtn) removeLastBtn.disabled = false;
 
         // Checks QR code is correct length
-        if (code.length !== 45) {
+        if (code.length < 44 || code.length > 45) {
           output.textContent = `❌ Invalid code (length ${code.length}, expected 45). ${code}`;
           codeReader.reset();
           if (scanNextBtn.style.visibility === "hidden") {
