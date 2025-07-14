@@ -10,10 +10,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const hints = new Map();
   const formats = [
     ZXing.BarcodeFormat.DATA_MATRIX,
-    ZXing.BarcodeFormat.EAN_13,
-    ZXing.BarcodeFormat.EAN_8,
-    ZXing.BarcodeFormat.UPC_A,
-    ZXing.BarcodeFormat.UPC_E
+    // ZXing.BarcodeFormat.EAN_13,
+    // ZXing.BarcodeFormat.EAN_8,
+    // ZXing.BarcodeFormat.UPC_A,
+    // ZXing.BarcodeFormat.UPC_E,
+    ZXing.BarcodeFormat.CODE_128,
+    ZXing.BarcodeFormat.CODE_39
   ];
 
   hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, formats);
