@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
     codeReader.decodeFromVideoDevice(currentDeviceId, videoElement, (result, err) => {
       if (result) {
         const format = result.getBarcodeFormat();
-        const code = result.getText().slice(1);
+        const code = result.getText();
         lastScannedCode = code;
         if (removeLastBtn.style.visibility === "hidden") {
           removeLastBtn.style.visibility = "visible";
@@ -102,18 +102,63 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function addToTable(index, entry) {
-    const year = "20"
     const row = document.createElement('tr');
-    const code = entry.code;
-    const format = entry.format;
-    const device = entry.code.slice(0,16);
-    const lot = entry.code.slice(34,44);
-    const produced = year.concat(entry.code.slice(26,28), "-", entry.code.slice(28,30), "-", entry.code.slice(30,32));
-    const expiry = year.concat(entry.code.slice(18,20), "-", entry.code.slice(20,22), "-", entry.code.slice(22,24));
+    const parsed = parseGS1(entry.code, entry.format);
+    
     row.dataset.code = entry.code;
-    row.innerHTML = `<td>${index}</td><td>${format}</td><td>${code}</td><td>${device}</td><td>${produced}</td><td>${expiry}</td><td>${lot}</td><td class="count">${entry.count}</td>`;
-    scanTableBody.appendChild(row);
+    row.innerHTML = `
+      <td>${index}</td>
+      <td>${parsed.device || ''}</td>
+      <td>${parsed.produced || ''}</td>
+      <td>${parsed.expiry || ''}</td>
+      <td>${parsed.lot || ''}</td>
+      <td class="count">${entry.count}</td>
+    `;
+    scanTableBody.appendChild(row);  
   }
+
+  function parseGS1(code, format) {
+  const result = {};
+
+    // If the format is CODE_128 (4)
+    if (format === 4) {
+      const aiRegex = /\((\d{2})\)([^\(]+)/g;
+      let match;
+      while ((match = aiRegex.exec(code)) !== null) {
+        const ai = match[1];
+        const value = match[2].trim();
+
+        switch (ai) {
+          case '01':
+            result.device = value;
+            break;
+          case '17':
+            result.expiry = `20${value.slice(0, 2)}-${value.slice(2, 4)}-${value.slice(4, 6)}`;
+            break;
+          case '11':
+            result.produced = `20${value.slice(0, 2)}-${value.slice(2, 4)}-${value.slice(4, 6)}`;
+            break;
+          case '10':
+            result.lot = value;
+            break;
+          default:
+            result[`AI_${ai}`] = value;
+        }
+      }
+    }
+
+    // Else: assume it's a 45-character flat string from Data Matrix
+    else if (format === 5) {
+      const code = entry.code.slice(1);
+      result.device = code.slice(0, 16);
+      result.expiry = `20${code.slice(18, 20)}-${code.slice(20, 22)}-${code.slice(22, 24)}`;
+      result.produced = `20${code.slice(26, 28)}-${code.slice(28, 30)}-${code.slice(30, 32)}`;
+      result.lot = code.slice(34, 44);
+    }
+
+  return result;
+}
+
 
   function updateCount(code, count) {
     const row = scanTableBody.querySelector(`tr[data-code="${code}"]`);
