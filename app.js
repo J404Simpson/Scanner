@@ -9,13 +9,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const hints = new Map();
   const formats = [
+    // ZXing.BarcodeFormat.AZTEC,
+    // ZXing.BarcodeFormat.QR_Code,
     ZXing.BarcodeFormat.DATA_MATRIX,
+    // ZXing.BarcodeFormat.CODE_128,
+    // ZXing.BarcodeFormat.CODE_39,
     // ZXing.BarcodeFormat.EAN_13,
     // ZXing.BarcodeFormat.EAN_8,
+    ZXing.BarcodeFormat.ITF,
     // ZXing.BarcodeFormat.UPC_A,
     // ZXing.BarcodeFormat.UPC_E,
-    ZXing.BarcodeFormat.CODE_128,
-    ZXing.BarcodeFormat.CODE_39
+    // ZXing.BarcodeFormat.PDF_417
   ];
 
   hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, formats);
