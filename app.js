@@ -53,6 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
     codeReader.decodeFromVideoDevice(currentDeviceId, videoElement, (result, err) => {
       if (result) {
         const code = result.getText();
+        const format = result.getBarcodeFormat();
         lastScannedCode = code;
         if (removeLastBtn.style.visibility === "hidden") {
           removeLastBtn.style.visibility = "visible";
