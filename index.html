@@ -12,6 +12,14 @@
 <body>
   <h1>Scanner</h1>
 
+  <div>
+    <label for="accountInput">Enter Account Number:</label>
+    <input type="text" id="accountInput" placeholder="e.g. 123456" />
+    <button id="verifyAccountBtn">Verify Account</button>
+  </div>
+
+  <div id="accountStatus" style="margin: 10px 0; font-weight: bold;"></div>
+
   <button id="startBtn">Start Scanning</button>
   <video id="video" autoplay muted playsinline></video>
   <div id="output">Click "Start Scanning"</div>
