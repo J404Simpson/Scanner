@@ -108,6 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
     row.dataset.code = entry.code;
     row.innerHTML = `
       <td>${index}</td>
+      <td>${entry.code}</td>
       <td>${parsed.device || ''}</td>
       <td>${parsed.produced || ''}</td>
       <td>${parsed.expiry || ''}</td>
