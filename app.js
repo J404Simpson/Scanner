@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function addToTable(index, entry) {
     const row = document.createElement('tr');
     const parsed = parseGS1(entry.code, entry.format);
-    
+
     row.dataset.code = entry.code;
     row.innerHTML = `
       <td>${index}</td>
@@ -114,9 +114,52 @@ document.addEventListener('DOMContentLoaded', () => {
       <td>${parsed.expiry || ''}</td>
       <td>${parsed.lot || ''}</td>
       <td class="count">${entry.count}</td>
+      <td><button class="inline-remove">Remove</button></td>
     `;
+
+    // Add event listener to the inline remove button
+    row.querySelector('.inline-remove').addEventListener('click', () => {
+      const code = entry.code;
+      const index = scannedCodes.findIndex(e => e.code === code);
+      if (index !== -1) {
+        const item = scannedCodes[index];
+        if (item.count > 1) {
+          item.count--;
+          updateCount(code, item.count);
+          output.textContent = `↩️ Decremented count (${item.count} left)`;
+        } else {
+          scannedCodes.splice(index, 1);
+          row.remove();
+          output.textContent = `🗑️ Removed code from list`;
+        }
+
+        // Re-disable global buttons if nothing left
+        if (scannedCodes.length === 0) {
+          removeLastBtn.disabled = true;
+          submitBtn.disabled = true;
+        }
+      }
+    });
+
     scanTableBody.appendChild(row);  
   }
+
+  // function addToTable(index, entry) {
+  //   const row = document.createElement('tr');
+  //   const parsed = parseGS1(entry.code, entry.format);
+    
+  //   row.dataset.code = entry.code;
+  //   row.innerHTML = `
+  //     <td>${index}</td>
+  //     <td>${parsed.code || ''}</td>
+  //     <td>${parsed.device || ''}</td>
+  //     <td>${parsed.produced || ''}</td>
+  //     <td>${parsed.expiry || ''}</td>
+  //     <td>${parsed.lot || ''}</td>
+  //     <td class="count">${entry.count}</td>
+  //   `;
+  //   scanTableBody.appendChild(row);  
+  // }
 
   function parseGS1(code, format) {
     const result = {
