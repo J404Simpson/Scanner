@@ -120,8 +120,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function parseGS1(code, format) {
     const result = {
-      code: code
+      code: code.replace(/[\x00-\x1F]/g, '')  // Remove control characters like FNC1
     };
+
+    // const result = {
+    //   code: code
+    // };
 
     // If the format is CODE_128 and it's a GS1 format, parse with AI logic
     if (format === ZXing.BarcodeFormat.CODE_128) {
