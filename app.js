@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
     row.dataset.code = entry.code;
     row.innerHTML = `
       <td>${index}</td>
-      <td>${entry.code}</td>
+      <td>${parsed.code || ''}</td>
       <td>${parsed.device || ''}</td>
       <td>${parsed.produced || ''}</td>
       <td>${parsed.expiry || ''}</td>
@@ -128,6 +128,8 @@ document.addEventListener('DOMContentLoaded', () => {
       while ((match = aiRegex.exec(code)) !== null) {
         const ai = match[1];
         const value = match[2].trim();
+
+        result.code = code;
 
         switch (ai) {
           case '01':
@@ -155,6 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
         code = code.slice(1);
       }
 
+      result.code = code;
       result.device = code.slice(0, 16);
       result.expiry = `20${code.slice(18, 20)}-${code.slice(20, 22)}-${code.slice(22, 24)}`;
       result.produced = `20${code.slice(26, 28)}-${code.slice(28, 30)}-${code.slice(30, 32)}`;
