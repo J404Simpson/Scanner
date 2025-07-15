@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const removeLastBtn = document.getElementById('removeLastBtn');
   const submitBtn = document.getElementById('submitBtn');
   const scanTableBody = document.querySelector('#scanTable tbody');
+  const verifyAccountBtn = document.getElementById('verifyAccountBtn');
 
   const hints = new Map();
   const formats = [
@@ -21,8 +22,46 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentDeviceId = null;
   let lastScannedCode = null;
 
+  startBtn.disabled = true;
   scanNextBtn.style.visibility = "hidden";
   removeLastBtn.style.visibility = "hidden";
+
+  async function verifyAccountNumber() {
+    const input = document.getElementById('accountInput');
+    const status = document.getElementById('accountStatus');
+    const accountNumber = input.value.trim();
+
+    if (!accountNumber) {
+      status.textContent = '⚠️ Please enter an account number.';
+      status.style.color = 'darkorange';
+      return;
+    }
+
+    status.textContent = '🔍 Looking up account...';
+    status.style.color = 'black';
+
+    try {
+      const res = await fetch(`http://localhost:3000/api/account?number=${encodeURIComponent(accountNumber)}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+
+      if (data && data.name) {
+        status.textContent = `✅ Found: ${data.name}`;
+        status.style.color = 'green';
+        startBtn.disabled = false;
+      } else {
+        status.textContent = '❌ Account not found.';
+        status.style.color = 'red';
+        startBtn.disabled = true;
+      }
+    } catch (err) {
+      console.error('Account lookup failed:', err);
+      status.textContent = '❌ Error contacting server.';
+      status.style.color = 'red';
+    }
+  }
+
+  verifyAccountBtn.addEventListener('click', verifyAccountNumber);
 
   startBtn.addEventListener('click', () => {
     startBtn.style.display = "none";
@@ -236,7 +275,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   scanNextBtn.addEventListener('click', () => startScan());
-
   removeLastBtn.addEventListener('click', () => {
 
     removeLastBtn.style.visibility = "hidden";
