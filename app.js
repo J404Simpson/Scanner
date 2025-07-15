@@ -53,7 +53,11 @@ document.addEventListener('DOMContentLoaded', () => {
     codeReader.decodeFromVideoDevice(currentDeviceId, videoElement, (result, err) => {
       if (result) {
         const format = result.getBarcodeFormat();
-        const code = result.getText();
+        let code = result.getText();
+
+        // Remove all non-printable characters (control chars like FNC1)
+        code = code.replace(/[\x00-\x1F]/g, '');
+
         lastScannedCode = code;
         if (removeLastBtn.style.visibility === "hidden") {
           removeLastBtn.style.visibility = "visible";
@@ -144,31 +148,10 @@ document.addEventListener('DOMContentLoaded', () => {
     scanTableBody.appendChild(row);  
   }
 
-  // function addToTable(index, entry) {
-  //   const row = document.createElement('tr');
-  //   const parsed = parseGS1(entry.code, entry.format);
-    
-  //   row.dataset.code = entry.code;
-  //   row.innerHTML = `
-  //     <td>${index}</td>
-  //     <td>${parsed.code || ''}</td>
-  //     <td>${parsed.device || ''}</td>
-  //     <td>${parsed.produced || ''}</td>
-  //     <td>${parsed.expiry || ''}</td>
-  //     <td>${parsed.lot || ''}</td>
-  //     <td class="count">${entry.count}</td>
-  //   `;
-  //   scanTableBody.appendChild(row);  
-  // }
-
   function parseGS1(code, format) {
     const result = {
-      code: code.replace(/[\x00-\x1F]/g, '')  // Remove control characters like FNC1
+      code: code.replace(/[\x00-\x1F]/g, '')  // Check again for control characters like FNC1
     };
-
-    // const result = {
-    //   code: code
-    // };
 
     // If the format is CODE_128 and it's a GS1 format, parse with AI logic
     if (format === ZXing.BarcodeFormat.CODE_128) {
@@ -236,57 +219,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     return result;
   }
-
-
-  // function parseGS1(code, format) {
-  // const result = {};
-
-  //   // If the format is CODE_128 (4)
-  //   if (format === ZXing.BarcodeFormat.CODE_128) {
-  //     const aiRegex = /\((\d{2})\)([^\(]+)/g;
-  //     let match;
-  //     while ((match = aiRegex.exec(code)) !== null) {
-  //       const ai = match[1];
-  //       const value = match[2].trim();
-
-  //       result.code = code;
-
-  //       switch (ai) {
-  //         case '01':
-  //           result.device = value;
-  //           break;
-  //         case '17':
-  //           result.expiry = `20${value.slice(0, 2)}-${value.slice(2, 4)}-${value.slice(4, 6)}`;
-  //           break;
-  //         case '11':
-  //           result.produced = `20${value.slice(0, 2)}-${value.slice(2, 4)}-${value.slice(4, 6)}`;
-  //           break;
-  //         case '10':
-  //           result.lot = value;
-  //           break;
-  //         default:
-  //           result[`AI_${ai}`] = value;
-  //       }
-  //     }
-  //   }
-
-  //   // If the format is DATA_MATRIX (5)
-  //   else if (format === ZXing.BarcodeFormat.DATA_MATRIX) {
-  //     // Strip control character at beginning if present
-  //     if (code.charCodeAt(0) < 32) {
-  //       code = code.slice(1);
-  //     }
-
-  //     result.code = code;
-  //     result.device = code.slice(0, 16);
-  //     result.expiry = `20${code.slice(18, 20)}-${code.slice(20, 22)}-${code.slice(22, 24)}`;
-  //     result.produced = `20${code.slice(26, 28)}-${code.slice(28, 30)}-${code.slice(30, 32)}`;
-  //     result.lot = code.slice(34, 44);
-  //   }
-
-  //   return result;
-  // }
-
 
   function updateCount(code, count) {
     const row = scanTableBody.querySelector(`tr[data-code="${code}"]`);
