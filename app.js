@@ -55,27 +55,25 @@ document.addEventListener('DOMContentLoaded', () => {
         const format = result.getBarcodeFormat();
         let code = result.getText();
 
-        // Remove all non-printable characters (control chars like FNC1)
+        // ✅ Clean control characters (like FNC1, ASCII 29)
         code = code.replace(/[\x00-\x1F]/g, '');
 
+        // ✅ Reject invalid or non-GS1 CODE_128 codes
+        if (format === ZXing.BarcodeFormat.CODE_128 && !isLikelyGS1(code)) {
+          output.textContent = `⚠️ Skipped non-GS1 CODE_128: ${code}`;
+          codeReader.reset();
+          scanNextBtn.disabled = false;
+          return;
+        }
+
         lastScannedCode = code;
+
         if (removeLastBtn.style.visibility === "hidden") {
           removeLastBtn.style.visibility = "visible";
-        };
+        }
         if (removeLastBtn) removeLastBtn.disabled = false;
 
-        // Checks QR code is correct length
-        // if (code.length < 43 || code.length > 44) {
-        //   output.textContent = `❌ Invalid code (length ${code.length}, expected 45). ${code}`;
-        //   codeReader.reset();
-        //   if (scanNextBtn.style.visibility === "hidden") {
-        //     scanNextBtn.style.visibility = "visible";
-        //   };
-        //   scanNextBtn.disabled = false;
-        //   return;
-        // }
-
-        // Checks if QR code already exists in table
+        // ✅ Deduplication check
         const existing = scannedCodes.find(entry => entry.code === code);
         if (existing) {
           existing.count++;
@@ -91,15 +89,16 @@ document.addEventListener('DOMContentLoaded', () => {
         codeReader.reset();
         if (scanNextBtn.style.visibility === "hidden") {
           scanNextBtn.style.visibility = "visible";
-        };
+        }
         scanNextBtn.disabled = false;
+
       } else if (err && !(err instanceof ZXing.NotFoundException)) {
         output.textContent = '⚠️ Scan error.';
         console.error('Scan error:', err);
         codeReader.reset();
         if (scanNextBtn.style.visibility === "hidden") {
           scanNextBtn.style.visibility = "visible";
-        };
+        }
         scanNextBtn.disabled = false;
       }
     });
@@ -107,7 +106,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function addToTable(index, entry) {
     const row = document.createElement('tr');
-    const parsed = parseGS1(entry.code, entry.format);
+    const parsed = isLikelyGS1(entry.code)
+      ? parseGS1(entry.code, entry.format)
+      : { code: entry.code }; // fallback — don't try parsing non-GS1
+
+    // const parsed = parseGS1(entry.code, entry.format);
 
     row.dataset.code = entry.code;
     row.innerHTML = `
@@ -218,6 +221,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     return result;
+  }
+
+  // Check code is GS1
+  function isLikelyGS1(code) {
+    return /^01\d{14}/.test(code);
   }
 
   function updateCount(code, count) {
