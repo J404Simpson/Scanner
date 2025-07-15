@@ -119,45 +119,68 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function parseGS1(code, format) {
-  const result = {};
+    const result = {
+      code: code
+    };
 
-    // If the format is CODE_128 (4)
+    // If the format is CODE_128 and it's a GS1 format, parse with AI logic
     if (format === ZXing.BarcodeFormat.CODE_128) {
-      const aiRegex = /\((\d{2})\)([^\(]+)/g;
-      let match;
-      while ((match = aiRegex.exec(code)) !== null) {
-        const ai = match[1];
-        const value = match[2].trim();
+      // Replace non-printable ASCII characters (usually FNC1 = ASCII 29)
+      const fnc1 = String.fromCharCode(29);
 
-        result.code = code;
+      let i = 0;
+      while (i < code.length) {
+        const ai2 = code.substr(i, 2);
+        const ai3 = code.substr(i, 3);
+        let ai = null;
+
+        // Try 3-digit AI first
+        if (['240', '241'].includes(ai3)) {
+          ai = ai3;
+          i += 3;
+        } else if (['00', '01', '10', '11', '17', '21'].includes(ai2)) {
+          ai = ai2;
+          i += 2;
+        } else {
+          console.warn('Unknown AI at position', i, code.substr(i, 4));
+          break;
+        }
+
+        let value;
+        if (['00'].includes(ai)) {
+          value = code.substr(i, 18); i += 18;
+        } else if (['01'].includes(ai)) {
+          value = code.substr(i, 14); i += 14;
+        } else if (['17', '11'].includes(ai)) {
+          value = code.substr(i, 6); i += 6;
+        } else if (['10', '21', '240', '241'].includes(ai)) {
+          // Variable length, ends with FNC1 or end of string
+          let end = code.indexOf(fnc1, i);
+          if (end === -1) end = code.length;
+          value = code.substring(i, end);
+          i = end + 1; // skip past separator
+        } else {
+          console.warn('Unhandled AI:', ai);
+          break;
+        }
 
         switch (ai) {
-          case '01':
-            result.device = value;
-            break;
-          case '17':
-            result.expiry = `20${value.slice(0, 2)}-${value.slice(2, 4)}-${value.slice(4, 6)}`;
-            break;
-          case '11':
-            result.produced = `20${value.slice(0, 2)}-${value.slice(2, 4)}-${value.slice(4, 6)}`;
-            break;
-          case '10':
-            result.lot = value;
-            break;
+          case '01': result.device = value; break;
+          case '17': result.expiry = `20${value.slice(0, 2)}-${value.slice(2, 4)}-${value.slice(4, 6)}`; break;
+          case '11': result.produced = `20${value.slice(0, 2)}-${value.slice(2, 4)}-${value.slice(4, 6)}`; break;
+          case '10': result.lot = value; break;
           default:
             result[`AI_${ai}`] = value;
         }
       }
     }
 
-    // If the format is DATA_MATRIX (5)
+    // If the format is DATA_MATRIX, parse by fixed slices (your logic seems fine)
     else if (format === ZXing.BarcodeFormat.DATA_MATRIX) {
-      // Strip control character at beginning if present
       if (code.charCodeAt(0) < 32) {
         code = code.slice(1);
       }
 
-      result.code = code;
       result.device = code.slice(0, 16);
       result.expiry = `20${code.slice(18, 20)}-${code.slice(20, 22)}-${code.slice(22, 24)}`;
       result.produced = `20${code.slice(26, 28)}-${code.slice(28, 30)}-${code.slice(30, 32)}`;
@@ -166,6 +189,56 @@ document.addEventListener('DOMContentLoaded', () => {
 
     return result;
   }
+
+
+  // function parseGS1(code, format) {
+  // const result = {};
+
+  //   // If the format is CODE_128 (4)
+  //   if (format === ZXing.BarcodeFormat.CODE_128) {
+  //     const aiRegex = /\((\d{2})\)([^\(]+)/g;
+  //     let match;
+  //     while ((match = aiRegex.exec(code)) !== null) {
+  //       const ai = match[1];
+  //       const value = match[2].trim();
+
+  //       result.code = code;
+
+  //       switch (ai) {
+  //         case '01':
+  //           result.device = value;
+  //           break;
+  //         case '17':
+  //           result.expiry = `20${value.slice(0, 2)}-${value.slice(2, 4)}-${value.slice(4, 6)}`;
+  //           break;
+  //         case '11':
+  //           result.produced = `20${value.slice(0, 2)}-${value.slice(2, 4)}-${value.slice(4, 6)}`;
+  //           break;
+  //         case '10':
+  //           result.lot = value;
+  //           break;
+  //         default:
+  //           result[`AI_${ai}`] = value;
+  //       }
+  //     }
+  //   }
+
+  //   // If the format is DATA_MATRIX (5)
+  //   else if (format === ZXing.BarcodeFormat.DATA_MATRIX) {
+  //     // Strip control character at beginning if present
+  //     if (code.charCodeAt(0) < 32) {
+  //       code = code.slice(1);
+  //     }
+
+  //     result.code = code;
+  //     result.device = code.slice(0, 16);
+  //     result.expiry = `20${code.slice(18, 20)}-${code.slice(20, 22)}-${code.slice(22, 24)}`;
+  //     result.produced = `20${code.slice(26, 28)}-${code.slice(28, 30)}-${code.slice(30, 32)}`;
+  //     result.lot = code.slice(34, 44);
+  //   }
+
+  //   return result;
+  // }
 
 
   function updateCount(code, count) {
